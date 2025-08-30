@@ -1,4 +1,4 @@
-# Leave Management System
+<img width="857" height="575" alt="Screenshot 2025-08-30 233548" src="https://github.com/user-attachments/assets/469e9c73-7150-4a8b-8882-8fe73ef6e8a5" /># Leave Management System
 
 A comprehensive, production-ready Leave Management System built with Python FastAPI, PostgreSQL, and modern authentication practices. Designed for startups and enterprises with role-based access control, secure initialization, and complete audit trails.
 
@@ -298,18 +298,6 @@ http://127.0.0.1:8000/api/v1/requests/1/reject
 - `PUT /api/v1/leave/requests/{id}/approve` - Approve request
 - `PUT /api/v1/leave/requests/{id}/reject` - Reject request
 
-## 🧪 Testing
-
-```bash
-# Run tests
-pytest
-
-# Run with coverage
-pytest --cov=app tests/
-```
-
-## 🚀 Deployment
-
 ### Production Considerations
 
 1. **Environment Variables**: Secure all sensitive configuration
@@ -318,24 +306,6 @@ pytest --cov=app tests/
 4. **Security**: Enable HTTPS, configure CORS properly
 5. **Monitoring**: Add logging and monitoring solutions
 
-### Docker Deployment
-
-```dockerfile
-FROM python:3.9-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-## 📊 Business Logic
-
-### Leave Balance Calculation
-
-- **Available Balance** = Allocated + Carried Forward - Used - Pending
-- **Pro-rated Allocation**: Based on joining date for new employees
-- **Carry Forward**: Configurable per leave type with limits
 
 ### Approval Workflow
 
@@ -366,26 +336,9 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🆘 Support
-
-For support and questions:
-
-- Create an issue in the repository
-- Contact the development team
-- Check the documentation
-
-## 🔮 Roadmap
-
-- [ ] Mobile app support
-- [ ] Advanced reporting and analytics
-- [ ] Integration with HR systems
-- [ ] Multi-tenant support
-- [ ] Advanced workflow customization
-- [ ] API rate limiting and monitoring
 
 ---
 
-**Built with ❤️ for modern enterprises**
 
 
 
