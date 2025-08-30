@@ -1,0 +1,10 @@
+# Ignore virtual environments
+venv/
+env/
+
+# Ignore sensitive config
+config.py
+
+# Bytecode
+__pycache__/
+*.py[cod]
