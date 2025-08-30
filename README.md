@@ -3,23 +3,52 @@
 A comprehensive, production-ready Leave Management System built with Python FastAPI, PostgreSQL, and modern authentication practices. Designed for startups and enterprises with role-based access control, secure initialization, and complete audit trails.
 
 ## 🚀 Features
+1. Authentication & Authorization
+JWT-based authentication for secure access
+Role-based access control (Super Admin, HR, Employee)
+Password hashing and secure login
+Session management and token expiration
 
-### Core Functionality
+2. User Management
+Role-specific onboarding: Super Admin, HR, Employee
+Employee profile creation and management
+Manager assignment for hierarchical approvals
+Update, deactivate, or delete user accounts
 
-- **Authentication & Authorization**: JWT-based authentication with role-based access control
-- **User Management**: Super Admin, HR, and Employee roles with secure onboarding
-- **Leave Management**: Complete leave request workflow with approval/rejection
-- **Leave Types**: Configurable leave categories with carry-forward rules
-- **Balance Tracking**: Real-time leave balance calculation and management
-- **Audit Trail**: Complete history of all actions and changes
-- **Email Notifications**: Automated notifications for all system events
+3. Leave Management
 
-### Security Features
+Full leave request workflow: apply, approve, reject, cancel
+Multi-level approvals based on manager or HR
+Leave request history per employee
+Leave request comments/notes for context
+Overlapping leave check: prevents multiple leaves for the same period
+Validations performed:
+Leave balance availability
+Maximum allowed leaves per type
+Probation period restrictions
+Date validity (start date < end date, future dates only)
+Manager approval required for certain leave types
+Duplicate leave requests prevention
 
-- **Secure Initialization**: Auto-creation of Super Admin with environment variables
-- **Password Security**: Secure password setup with tokens and mandatory first-time changes
-- **Role Enforcement**: Strict role-based access control throughout the system
-- **Audit Logging**: Complete traceability of all system actions
+4. Leave Types
+Configurable leave categories (Casual, Sick, Paid, Unpaid, etc.)
+Custom leave policies (carry-forward, max per year, accrual rules)
+Conditional leave rules (e.g., probation period restrictions)
+
+5. Balance Tracking
+
+Real-time leave balance updates
+Automatic deduction on approval
+Display of remaining, used, and pending leaves
+Accrual and carry-forward calculations
+
+6. Audit Trail
+Complete logging of all actions (creation, update, approval, rejection)
+Tracking who performed what action and when
+
+7. Email Notifications
+Automated notifications for leave requests, approvals, and rejections
+Reminders for pending approvals
 
 ### Architecture
 
@@ -54,6 +83,9 @@ A comprehensive, production-ready Leave Management System built with Python Fast
 - **employee_leave_balances**: Leave balance tracking
 - **leave_requests**: Leave applications and workflow
 - **leave_request_audits**: Complete audit trail
+
+
+
 
 ### Key Relationships
 
@@ -159,6 +191,91 @@ SUPER_ADMIN_PASSWORD=ChangeMe123!
 - **Employee**: Leave requests, profile management, balance viewing
 
 ## 📋 API Endpoints
+
+1)Super-admin login 
+http://127.0.0.1:8000/api/v1/auth/login
+type : post
+{
+  "email": "alex@example.com",
+  "password": "Test@123"
+}
+
+2)Add HR
+type : post
+http://127.0.0.1:8000/api/v1/users
+{
+  "email": "priya@example.com",
+  "password": "test@123",
+  "role": "hr",
+  "first_name": "Priya",
+  "last_name": "Sharma"
+}
+3)HR can add leave-types
+http://127.0.0.1:8000/api/v1/leave-types
+type : post
+{
+  "name": "Sick Leave",
+  "description": "Medical leave requiring documentation",
+  "category": "sick",
+  "default_balance": 12,
+  "allow_carry_forward": false,
+  "max_carry_forward": 0,
+  "allow_half_day": true,
+  "allow_hourly": false,
+  "max_consecutive_days": 10,
+  "requires_approval": true,
+  "can_exceed_balance": true,
+  "requires_documentation": true
+}
+4)Admin can view hr 
+type : GET
+http://127.0.0.1:8000/api/v1/users/hr
+5)
+http://127.0.0.1:8000/api/v1/users/employees/onboard
+type : post
+{
+    
+  "email": "alice@gmail.com",
+  "first_name": "manasa",
+  "last_name": "veera",
+  "employee_id": "EMP1001",
+  "phone": "+91-9876543210",
+  "department": "Engineering",
+  "designation": "Intern",
+  "joining_date": "2025-08-01",
+  "manager_id": 1
+}
+6)get all employees details
+type : GET
+http://127.0.0.1:8000/api/v1/users/employees/list
+7)get user by id
+type : GET
+http://127.0.0.1:8000/api/v1/users/5
+8)get leave_types
+type : GET
+http://127.0.0.1:8000/api/v1/leave-types
+9)update leave_type 
+type : POST
+http://127.0.0.1:8000/api/v1/leave-types/1
+{
+  "name": "Annual Leave Updated",
+  "description": "Updated description",
+  "max_days": 25,
+  "is_active": true
+}
+10)get leave requests
+type : GET
+http://127.0.0.1:8000/api/v1/leave/requests
+11)get all pending requests
+type : GET
+http://127.0.0.1:8000/api/v1/requests/pending
+12)approve request
+type : POST
+http://127.0.0.1:8000/api/v1/requests/1/approve
+13)reject leave request
+type : POST
+http://127.0.0.1:8000/api/v1/requests/1/reject
+{"rejection_reason": "Project deadlines"}
 
 ### Authentication
 
