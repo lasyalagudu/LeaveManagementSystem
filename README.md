@@ -1,4 +1,11 @@
-<img width="857" height="575" alt="Screenshot 2025-08-30 233548" src="https://github.com/user-attachments/assets/469e9c73-7150-4a8b-8882-8fe73ef6e8a5" /># Leave Management System
+<img width="857" height="575" alt="Screenshot 2025-08-30 233548" src="https://github.com/user-attachments/assets/469e9c73-7150-4a8b-8882-8fe73ef6e8a5" />
+
+
+<img width="820" height="642" alt="Screenshot 2025-08-30 232106" src="https://github.com/user-attachments/assets/2bfc02aa-c580-47e8-a943-2d9bc5c8c232" />
+
+
+
+# Leave Management System
 
 A comprehensive, production-ready Leave Management System built with Python FastAPI, PostgreSQL, and modern authentication practices. Designed for startups and enterprises with role-based access control, secure initialization, and complete audit trails.
 
