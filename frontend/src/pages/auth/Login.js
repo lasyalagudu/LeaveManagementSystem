@@ -7,7 +7,6 @@ import {
   Card,
   Form,
   Button,
-  Alert,
   Spinner,
 } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
@@ -16,7 +15,7 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: "",
+    email: "", // we’ll map this as "username" in backend
     password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -38,7 +37,6 @@ const Login = () => {
       [name]: value,
     }));
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -76,6 +74,7 @@ const Login = () => {
     setLoading(true);
 
     try {
+      // ✅ backend expects "username", not "email"
       const result = await login(formData.email, formData.password);
 
       if (result.success) {
@@ -184,26 +183,10 @@ const Login = () => {
                   </Button>
                 </Form>
 
-                {/* Demo Credentials */}
-                <div className="mt-4 p-3 bg-light rounded">
-                  <h6 className="fw-semibold mb-2">Demo Credentials:</h6>
-                  <div className="small text-muted">
-                    <div>
-                      <strong>Super Admin:</strong> admin@company.com / admin123
-                    </div>
-                    <div>
-                      <strong>HR:</strong> hr@company.com / hr123
-                    </div>
-                    <div>
-                      <strong>Employee:</strong> employee@company.com / emp123
-                    </div>
-                  </div>
-                </div>
-
                 {/* Footer */}
                 <div className="text-center mt-4">
                   <p className="text-muted small mb-0">
-                    © 2024 Leave Management System. All rights reserved.
+                    © 2025 Leave Management System. All rights reserved.
                   </p>
                 </div>
               </Card.Body>
@@ -216,8 +199,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
-
-
-

@@ -12,7 +12,12 @@ class EmployeeBase(BaseModel):
     joining_date: date
     manager_id: Optional[int] = None
 
+class UserInfo(BaseModel):
+    email: str
+    role: str
 
+    class Config:
+        orm_mode = True
 class EmployeeCreate(EmployeeBase):
     email: str
     employee_id: str  # Company employee ID
@@ -33,7 +38,7 @@ class EmployeeResponse(EmployeeBase):
     employee_id: str
     created_at: datetime
     updated_at: Optional[datetime] = None
-    
+    user: UserInfo
     class Config:
         orm_mode = True
 

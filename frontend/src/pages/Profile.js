@@ -15,8 +15,6 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import {
   FaUser,
-  FaEnvelope,
-  FaPhone,
   FaBuilding,
   FaCalendarAlt,
   FaShieldAlt,
@@ -520,6 +518,10 @@ const Profile = () => {
 };
 
 export default Profile;
+
+
+
+
 
 
 

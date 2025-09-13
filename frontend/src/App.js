@@ -9,7 +9,10 @@ import { Container } from "react-bootstrap";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import About from "./pages/About";
+import EmployeeById from "./pages/admin/EmployeeById";
+import Employees from "./pages/admin/Employees";
+import ViewEmployee from "./pages/admin/ViewEmployee";
 // Context
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
@@ -23,13 +26,13 @@ import Dashboard from "./pages/Dashboard";
 import LeaveRequests from "./pages/leave/LeaveRequests";
 import MyLeaveRequests from "./pages/leave/MyLeaveRequests";
 import CreateLeaveRequest from "./pages/leave/CreateLeaveRequest";
-import LeaveBalances from "./pages/leave/LeaveBalances";
 import MyLeaveBalances from "./pages/leave/MyLeaveBalances";
 import LeaveTypes from "./pages/admin/LeaveTypes";
-import Employees from "./pages/admin/Employees";
+
 import Holidays from "./pages/admin/Holidays";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import EmployeesDashboard from "./pages/admin/EmployeesDashboard";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -67,6 +70,7 @@ function AppRoutes() {
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
+            <Route path="/about" element={<About />} />
 
             {/* Protected Routes */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -76,6 +80,52 @@ function AppRoutes() {
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/employees"
+              element={
+                <AdminRoute>
+                  <EmployeesDashboard />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/hr/leave-requests"
+              element={
+                <AdminRoute>
+                  {" "}
+                  {/* Or HRRoute if you built one */}
+                  <LeaveRequests />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/employees/add"
+              element={
+                <AdminRoute>
+                  <Employees />
+                  {/* existing add/edit modal component */}
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/employees/list"
+              element={
+                <AdminRoute>
+                  <ViewEmployee />
+                  {/* existing table component */}
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/employees/view"
+              element={
+                <AdminRoute>
+                  <EmployeeById /> {/* new component to fetch by ID */}
+                </AdminRoute>
               }
             />
 
@@ -102,14 +152,6 @@ function AppRoutes() {
                 <ProtectedRoute>
                   <CreateLeaveRequest />
                 </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/leave/balances"
-              element={
-                <AdminRoute>
-                  <LeaveBalances />
-                </AdminRoute>
               }
             />
             <Route
@@ -188,8 +230,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-

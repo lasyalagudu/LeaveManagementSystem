@@ -49,9 +49,8 @@ const MyLeaveBalances = () => {
   const fetchMyBalances = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `/api/v1/leave/my-balances?year=${selectedYear}`
-      );
+      const response = await axios.get(`/api/v1/leave/my-balances`);
+
       setBalances(response.data);
 
       // Extract unique years from balances
@@ -476,6 +475,10 @@ const MyLeaveBalances = () => {
 };
 
 export default MyLeaveBalances;
+
+
+
+
 
 
 

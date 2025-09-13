@@ -7,6 +7,7 @@ from app.services.employee_service import EmployeeService
 from app.schemas.user import UserCreate, UserUpdate, UserResponse
 from app.schemas.employee import EmployeeOnboard, EmployeeResponse
 from app.models.user import User, UserRole
+from fastapi import BackgroundTasks
 from app.api.deps import get_super_admin, get_hr_or_super_admin, get_any_authenticated_user
 import logging
 import uuid
@@ -56,16 +57,25 @@ async def create_user(
 # -----------------------------
 # EMPLOYEE ONBOARDING ROUTE
 # -----------------------------
-
 @router.post("/employees/onboard", response_model=EmployeeResponse)
-async def onboard_employee(
+async def onboard_employee_route(
     employee_data: EmployeeOnboard,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_hr_or_super_admin),
     db: Session = Depends(get_db)
 ):
     try:
-        employee = await employee_service.onboard_employee(db, employee_data, current_user)
+        employee, temp_password = await employee_service.onboard_employee(db, employee_data, current_user)
+
+        # Send email in background
+        background_tasks.add_task(
+            employee_service.email_service.send_welcome_email,
+            employee.user,
+            temp_password
+        )
+
         return employee
+
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
     except Exception as e:
@@ -103,6 +113,16 @@ async def get_hr_users(
         logger.error(f"Error getting HR users: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+
+# -----------------------------
+# GET EMPLOYEE BY EMPLOYEE_ID
+# -----------------------------
+@router.get("/employees/{employee_id}", response_model=EmployeeResponse)
+async def get_employee(employee_id: str, db: Session = Depends(get_db)):
+    employee = db.query(Employee).filter(Employee.employee_id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    return employee
 
 @router.get("/employees", response_model=List[UserResponse])
 async def get_employee_users(

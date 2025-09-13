@@ -23,22 +23,25 @@ class EmployeeService:
     
     
         
-    async def onboard_employee(self, db: Session, employee_data: EmployeeOnboard, created_by: User) -> Optional[Employee]:
+    async def onboard_employee(self, db: Session, employee_data: EmployeeOnboard, created_by: User) -> tuple[Employee, str]:
         if created_by.role not in [UserRole.HR, UserRole.SUPER_ADMIN]:
             raise ValueError("Only HR or Super Admin can onboard employees")
+
         try:
             # Generate a temporary password
             temp_password = secrets.token_urlsafe(8)  # random 8-character password
 
+            # Create user
             user_create = UserCreate(
                 email=employee_data.email,
                 first_name=employee_data.first_name,
                 last_name=employee_data.last_name,
                 role=UserRole.EMPLOYEE,
-                password=temp_password  # pass the auto-generated password
+                password=temp_password
             )
             user = self.user_service.create_user(db, user_create)
 
+            # Create employee
             employee = Employee(
                 user_id=user.id,
                 employee_id=employee_data.employee_id,
@@ -54,14 +57,12 @@ class EmployeeService:
             db.commit()
             db.refresh(employee)
 
-            # Send welcome email with the temporary password
-            await self.email_service.send_welcome_email(user, temp_password)
-
-
             # Initialize leave balances
             self._initialize_leave_balances(db, employee.id, employee_data.joining_date.year)
 
-            return employee
+            # ✅ Return employee and temp password; email will be sent from route
+            return employee, temp_password
+
         except IntegrityError as e:
             db.rollback()
             logger.error(f"DB error onboarding employee: {e}")
@@ -70,6 +71,11 @@ class EmployeeService:
             db.rollback()
             logger.error(f"Error onboarding employee: {e}")
             raise
+
+    def get_employee_by_employee_id(self, db: Session, employee_id: str):
+        from app.models.employee import Employee
+        return db.query(Employee).filter(Employee.employee_id == employee_id).first()
+
 
     def _initialize_leave_balances(self, db: Session, employee_id: int, year: int):
         leave_types = db.query(LeaveType).filter(LeaveType.is_active==True).all()
@@ -182,6 +188,10 @@ class EmployeeService:
             return employee
 
         return None
+
+
+
+
 
 
 

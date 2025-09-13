@@ -8,3 +8,5 @@ config.py
 # Bytecode
 __pycache__/
 *.py[cod]
+
+node_modules/

@@ -1,24 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-  Navbar,
-  Nav,
-  Container,
-  Button,
-  Dropdown,
-  Badge,
-} from "react-bootstrap";
+import { Navbar, Nav, Container, Dropdown, Badge } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
-import {
-  FaHome,
-  FaCalendarAlt,
-  FaUsers,
-  FaCog,
-  FaSignOutAlt,
-  FaUser,
-  FaBell,
-  FaPlus,
-} from "react-icons/fa";
+import { FaHome, FaUser, FaSignOutAlt, FaBell } from "react-icons/fa";
 
 const Navigation = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -31,9 +15,9 @@ const Navigation = () => {
     navigate("/login");
   };
 
-  const isActive = (path) => {
-    return location.pathname === path;
-  };
+  const isActive = (path) => location.pathname === path;
+
+  if (!isAuthenticated) return null;
 
   const getRoleDisplayName = (role) => {
     const roleNames = {
@@ -44,10 +28,6 @@ const Navigation = () => {
     return roleNames[role] || role;
   };
 
-  if (!isAuthenticated) {
-    return null;
-  }
-
   return (
     <Navbar
       bg="primary"
@@ -55,120 +35,27 @@ const Navigation = () => {
       expand="lg"
       className="shadow-sm"
       expanded={expanded}
-      onToggle={() => setExpanded(!expanded)}
+      onToggle={(val) => setExpanded(val)}
     >
       <Container>
         <Navbar.Brand as={Link} to="/dashboard" className="fw-bold">
-          <FaHome className="me-2" />
-          LMS
+          <FaHome className="me-2" /> LMS
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        <Navbar.Collapse id="navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link
-              as={Link}
-              to="/dashboard"
-              active={isActive("/dashboard")}
-              onClick={() => setExpanded(false)}
-            >
-              <FaHome className="me-1" />
+            <Nav.Link as={Link} to="/dashboard" active={isActive("/dashboard")}>
               Dashboard
             </Nav.Link>
-
-            {/* Leave Management */}
             <Nav.Link
               as={Link}
-              to="/leave/my-requests"
-              active={isActive("/leave/my-requests")}
+              to="/about"
+              active={isActive("/about")}
               onClick={() => setExpanded(false)}
             >
-              <FaCalendarAlt className="me-1" />
-              My Leaves
+              About
             </Nav.Link>
-
-            <Nav.Link
-              as={Link}
-              to="/leave/create"
-              active={isActive("/leave/create")}
-              onClick={() => setExpanded(false)}
-            >
-              <FaPlus className="me-1" />
-              Apply Leave
-            </Nav.Link>
-
-            <Nav.Link
-              as={Link}
-              to="/leave/my-balances"
-              active={isActive("/leave/my-balances")}
-              onClick={() => setExpanded(false)}
-            >
-              <FaCalendarAlt className="me-1" />
-              My Balances
-            </Nav.Link>
-
-            {/* Admin Only Links */}
-            {(user?.role === "hr" || user?.role === "super_admin") && (
-              <>
-                <Nav.Link
-                  as={Link}
-                  to="/leave/requests"
-                  active={isActive("/leave/requests")}
-                  onClick={() => setExpanded(false)}
-                >
-                  <FaCalendarAlt className="me-1" />
-                  All Requests
-                  <Badge bg="warning" text="dark" className="ms-1">
-                    Pending
-                  </Badge>
-                </Nav.Link>
-
-                <Nav.Link
-                  as={Link}
-                  to="/leave/balances"
-                  active={isActive("/leave/balances")}
-                  onClick={() => setExpanded(false)}
-                >
-                  <FaCalendarAlt className="me-1" />
-                  All Balances
-                </Nav.Link>
-              </>
-            )}
-
-            {/* HR and Super Admin Only */}
-            {(user?.role === "hr" || user?.role === "super_admin") && (
-              <>
-                <Nav.Link
-                  as={Link}
-                  to="/admin/leave-types"
-                  active={isActive("/admin/leave-types")}
-                  onClick={() => setExpanded(false)}
-                >
-                  <FaCog className="me-1" />
-                  Leave Types
-                </Nav.Link>
-
-                <Nav.Link
-                  as={Link}
-                  to="/admin/employees"
-                  active={isActive("/admin/employees")}
-                  onClick={() => setExpanded(false)}
-                >
-                  <FaUsers className="me-1" />
-                  Employees
-                </Nav.Link>
-
-                <Nav.Link
-                  as={Link}
-                  to="/admin/holidays"
-                  active={isActive("/admin/holidays")}
-                  onClick={() => setExpanded(false)}
-                >
-                  <FaCalendarAlt className="me-1" />
-                  Holidays
-                </Nav.Link>
-              </>
-            )}
           </Nav>
 
           <Nav className="ms-auto">
@@ -184,7 +71,7 @@ const Navigation = () => {
               </Badge>
             </Nav.Link>
 
-            {/* User Menu */}
+            {/* User Dropdown */}
             <Dropdown align="end">
               <Dropdown.Toggle variant="outline-light" id="dropdown-user">
                 <FaUser className="me-1" />
@@ -202,16 +89,11 @@ const Navigation = () => {
                   </Badge>
                 </Dropdown.Header>
                 <Dropdown.Divider />
-
                 <Dropdown.Item as={Link} to="/profile">
-                  <FaUser className="me-2" />
                   Profile
                 </Dropdown.Item>
-
                 <Dropdown.Divider />
-
                 <Dropdown.Item onClick={handleLogout} className="text-danger">
-                  <FaSignOutAlt className="me-2" />
                   Logout
                 </Dropdown.Item>
               </Dropdown.Menu>
@@ -224,8 +106,3 @@ const Navigation = () => {
 };
 
 export default Navigation;
-
-
-
-
-

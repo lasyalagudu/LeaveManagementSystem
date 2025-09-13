@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 async def test_email():
     msg = MIMEText("Test email from FastAPI")
     msg["From"] = "lasyalagudu@gmail.com"
-    msg["To"] = "manasaveera7799@gmail.com"
+    msg["To"] = "lasyalagudu@gmail.com"
     msg["Subject"] = "SMTP Test"
     
     await send(
@@ -13,7 +13,7 @@ async def test_email():
         hostname="smtp.gmail.com",
         port=587,
         username="lasyalagudu@gmail.com",
-        password="tskf rcls wiqf qmpa",
+        password="",
         start_tls=True
     )
 
