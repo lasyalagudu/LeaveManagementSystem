@@ -15,11 +15,11 @@ import Employees from "./pages/admin/Employees";
 import ViewEmployee from "./pages/admin/ViewEmployee";
 // Context
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-
+import EmployeeRoute from "./components/EmployeeRoute";
 // Components
 import Navigation from "./components/layout/Navigation";
 import Footer from "./components/layout/Footer";
-
+import HomePage from "./pages/HomePage";
 // Pages
 import Login from "./pages/auth/Login";
 import Dashboard from "./pages/Dashboard";
@@ -33,7 +33,9 @@ import Holidays from "./pages/admin/Holidays";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import EmployeesDashboard from "./pages/admin/EmployeesDashboard";
-
+import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
+import CancelLeaveRequest from "./pages/employee/CancelRequest";
+import ModifyLeaveRequest from "./pages/employee/ModifyLeaveRequest";
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user, isAuthenticated } = useAuth();
@@ -71,6 +73,8 @@ function AppRoutes() {
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/about" element={<About />} />
+            <Route path="/" element={<HomePage />} />
+
 
             {/* Protected Routes */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -126,6 +130,43 @@ function AppRoutes() {
                 <AdminRoute>
                   <EmployeeById /> {/* new component to fetch by ID */}
                 </AdminRoute>
+              }
+            />
+
+            {/* {Employee routes} */}
+            <Route
+              path="/employee/dashboard"
+              element={
+                <EmployeeRoute>
+                  <EmployeeDashboard />
+                </EmployeeRoute>
+              }
+            />
+
+            <Route
+              path="/employee/apply-leave"
+              element={
+                <EmployeeRoute>
+                  <CreateLeaveRequest />
+                </EmployeeRoute>
+              }
+            />
+
+            <Route
+              path="/leave/modify"
+              element={
+                <EmployeeRoute>
+                  <ModifyLeaveRequest />
+                </EmployeeRoute>
+              }
+            />
+
+            <Route
+              path="/leave/cancel"
+              element={
+                <EmployeeRoute>
+                  <CancelLeaveRequest/>
+                </EmployeeRoute>
               }
             />
 
@@ -230,3 +271,5 @@ function App() {
 }
 
 export default App;
+
+
