@@ -79,6 +79,9 @@ class LeaveTypeResponse(BaseModel):
     requires_documentation: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
+    class Config:
+        orm_mode = True
+
 class LeaveRequestBase(BaseModel):
     leave_type_id: int
     start_date: date
@@ -264,7 +267,8 @@ class LeaveRequestResponse(LeaveRequestBase):
     updated_at: Optional[datetime] = None
     
     class Config:
-        from_attributes = True
+        orm_mode = True
+
 
 
 class LeaveBalanceResponse(BaseModel):
