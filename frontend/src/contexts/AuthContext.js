@@ -18,51 +18,71 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  // Configure axios defaults
-  useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      try {
-        const decoded = jwt_decode(token);
-        const currentTime = Date.now() / 1000;
-
-        if (decoded.exp < currentTime) {
-          // Token expired
-          logout();
-        } else {
-          setUser(decoded);
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        console.error("Token decode error:", error);
-        logout();
-      }
+  // Fetch full user profile from API
+  const fetchUserProfile = async () => {
+    try {
+      const response = await axios.get("/api/v1/users/me");
+      setUser(response.data);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error("Fetch user profile error:", error);
+      logout();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  // Handle token change & load user
+  useEffect(() => {
+    const initializeAuth = async () => {
+      if (token) {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        try {
+          const decoded = jwt_decode(token);
+          const currentTime = Date.now() / 1000;
+
+          if (decoded.exp < currentTime) {
+            logout();
+            setLoading(false);
+          } else {
+            await fetchUserProfile();
+          }
+        } catch (error) {
+          console.error("Token decode error:", error);
+          logout();
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
   }, [token]);
 
+  // Login function
   const login = async (email, password) => {
     try {
-      const response = await axios.post("/api/v1/auth/login", {
-        email,
-        password,
-      });
-
-      const { access_token, user: userData } = response.data;
-
-      // Store token
+      // Call login endpoint to get token
+      const response = await axios.post("/api/v1/auth/login", { email, password });
+      const { access_token } = response.data;
+  
+      // Store token in localStorage and state
       localStorage.setItem("token", access_token);
       setToken(access_token);
-
-      // Set axios default header
+  
+      // Set default Authorization header for future requests
       axios.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
-
-      // Decode and set user
-      const decoded = jwt_decode(access_token);
-      setUser(decoded);
+  
+      // Fetch the user profile using the new token
+      const userResponse = await axios.get("/api/v1/users/me");
+      const userData = userResponse.data;
+  
+      // Set user and authentication state
+      setUser(userData);
       setIsAuthenticated(true);
-
-      return { success: true, user: decoded };
+  
+      return { success: true, user: userData };
     } catch (error) {
       console.error("Login error:", error);
       return {
@@ -71,7 +91,9 @@ export const AuthProvider = ({ children }) => {
       };
     }
   };
+  
 
+  // Logout function
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
@@ -80,9 +102,10 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common["Authorization"];
   };
 
+  // Update user profile
   const updateProfile = async (profileData) => {
     try {
-      const response = await axios.put("/api/v1/users/me", profileData);
+      const response = await axios.put("/api/v1/users/me/password", profileData);
       const updatedUser = { ...user, ...response.data };
       setUser(updatedUser);
       return { success: true, user: updatedUser };
@@ -95,11 +118,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const changePassword = async (currentPassword, newPassword) => {
+  // Change password
+  const changePassword = async (oldPassword, newPassword, confirmPassword) => {
     try {
       await axios.put("/api/v1/users/me/password", {
-        current_password: currentPassword,
+        old_password: oldPassword,
         new_password: newPassword,
+        confirm_password: confirmPassword,
       });
       return { success: true };
     } catch (error) {
@@ -110,7 +135,9 @@ export const AuthProvider = ({ children }) => {
       };
     }
   };
+  
 
+  // Refresh token
   const refreshToken = async () => {
     try {
       const response = await axios.post("/api/v1/auth/refresh");
@@ -144,7 +171,5 @@ export const AuthProvider = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-
 
 
