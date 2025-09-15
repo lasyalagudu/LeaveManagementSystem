@@ -90,6 +90,9 @@ class LeaveService:
             employee = self.employee_service.get_employee_by_user_id(db, employee_user.id)
             if not employee:
                 raise ValueError("Employee record not found")
+
+            if self._employee_on_probation(db, employee.id):
+                raise ValueError("Employees on probation cannot apply for leave")
             
             # Get leave type for validation
             leave_type = self.get_leave_type_by_id(db, leave_request_data.leave_type_id)
