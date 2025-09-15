@@ -12,6 +12,7 @@ from app.schemas.leave import (
 from app.services.leave_service import LeaveService
 from app.services.employee_service import EmployeeService
 from app.schemas.leave import LeaveTypeResponse
+from app.models import LeaveType
 
 router = APIRouter()
 leave_service = LeaveService()
@@ -35,12 +36,10 @@ def create_leave_type(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 @router.get("/leave-types", response_model=List[LeaveTypeResponse])
-def get_leave_types(
-    active_only: bool = True,
-    db: Session = Depends(get_db)
-):
-    """Get all leave types (public endpoint)"""
-    return leave_service.get_all_leave_types(db, active_only)
+def get_leave_types(db: Session = Depends(get_db)):
+    leave_types = db.query(LeaveType).all()
+    return [LeaveTypeResponse.from_orm(lt) for lt in leave_types]
+
 
 @router.get("/leave-types/{leave_type_id}", response_model=LeaveTypeResponse)
 def get_leave_type(
@@ -70,9 +69,8 @@ def update_leave_type(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
-
 # Leave Request Management
-@router.post("/requests", response_model=LeaveRequestResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/leave-requests", response_model=LeaveRequestResponse, status_code=status.HTTP_201_CREATED)
 def create_leave_request(
     leave_request_data: LeaveRequestCreate,
     current_user: User = Depends(get_current_user),
@@ -87,7 +85,7 @@ def create_leave_request(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
-@router.get("/requests", response_model=List[LeaveRequestResponse])
+@router.get("/leave-requests", response_model=List[LeaveRequestResponse])
 def get_leave_requests(
     employee_id: int = None,
     current_user: User = Depends(get_current_user),
@@ -108,7 +106,7 @@ def get_leave_requests(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
-@router.get("/requests/pending", response_model=List[LeaveRequestResponse])
+@router.get("/leave-requests/pending", response_model=List[LeaveRequestResponse])
 def get_pending_leave_requests(
     current_user: User = Depends(get_hr_or_super_admin),
     db: Session = Depends(get_db)
@@ -121,7 +119,7 @@ def get_pending_leave_requests(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
-@router.get("/requests/{request_id}", response_model=LeaveRequestResponse)
+@router.get("/leave-requests/{request_id}", response_model=LeaveRequestResponse)
 def get_leave_request(
     request_id: int,
     current_user: User = Depends(get_current_user),
@@ -144,7 +142,7 @@ def get_leave_request(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
-@router.put("/requests/{request_id}/approve", response_model=LeaveRequestResponse)
+@router.put("/leave-requests/{request_id}/approve", response_model=LeaveRequestResponse)
 def approve_leave_request(
     request_id: int,
     comments: str = None,
@@ -162,7 +160,7 @@ def approve_leave_request(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
-@router.put("/requests/{request_id}/reject", response_model=LeaveRequestResponse)
+@router.put("/leave-requests/{request_id}/reject", response_model=LeaveRequestResponse)
 def reject_leave_request(
     request_id: int,
     rejection_reason: str,
@@ -180,7 +178,7 @@ def reject_leave_request(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
-@router.put("/requests/{request_id}/cancel", response_model=LeaveRequestResponse)
+@router.put("/leave-requests/{request_id}/cancel", response_model=LeaveRequestResponse)
 def cancel_leave_request(
     request_id: int,
     comments: str = None,
@@ -198,7 +196,22 @@ def cancel_leave_request(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
-# Employee-specific endpoints
+# Audit Logs (update route path)
+@router.get("/leave-requests/{request_id}/audit", response_model=List[LeaveAuditResponse])
+def get_leave_audit_logs(
+    request_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get audit logs for a leave request with role-based access control"""
+    try:
+        return leave_service.get_leave_audit_logs(db, request_id, current_user)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+
+# Employee-specific endpoints (optional renaming for consistency)
 @router.get("/my-requests", response_model=List[LeaveRequestResponse])
 def get_my_leave_requests(
     status_filter: str = None,
