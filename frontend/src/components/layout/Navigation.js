@@ -46,7 +46,7 @@ const Navigation = () => {
         <Navbar.Collapse id="navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/dashboard" active={isActive("/dashboard")}>
-              Dashboard
+              Home
             </Nav.Link>
             <Nav.Link
               as={Link}
@@ -106,3 +106,6 @@ const Navigation = () => {
 };
 
 export default Navigation;
+
+
+
